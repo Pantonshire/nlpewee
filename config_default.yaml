@@ -1,0 +1,6 @@
+port: 8000
+connect_timeout: 120s
+tls:
+  enabled: false
+  key: path/to/key
+  crt: path/to/crt

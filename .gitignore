@@ -2,3 +2,9 @@
 
 .idea
 .vscode
+
+/nlpewee
+build/
+
+nlpewee.yaml
+config.yaml
