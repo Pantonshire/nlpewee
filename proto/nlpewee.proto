@@ -1,0 +1,40 @@
+syntax = "proto3";
+
+option go_package = "github.com/pantonshire/nlpewee/proto";
+
+package nlpewee;
+
+service NLPewee {
+  rpc Tokenize      (TokenizeRequest) returns (TokenizeResponse);
+  rpc TokenizeClean (TokenizeRequest) returns (TokenizeResponse);
+}
+
+enum Language {
+  ENGLISH = 0;
+}
+
+message TokenizeRequest {
+  string text = 1;
+  Language language = 2;
+}
+
+message TokenizeResponse {
+  repeated Sentence sentences = 1;
+}
+
+message Sentence {
+  repeated Token tokens = 1;
+  repeated Entity entities = 2;
+}
+
+message Token {
+  string text = 1;
+  string stem = 2;
+  string tag = 3;
+  string label = 4;
+}
+
+message Entity {
+  string text = 1;
+  string label = 2;
+}
