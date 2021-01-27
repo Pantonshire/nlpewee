@@ -9,19 +9,11 @@ import (
 type NLPeweeServer struct {}
 
 func (server NLPeweeServer) Tokenize(ctx context.Context, req *pb.TokenizeRequest) (*pb.TokenizeResponse, error) {
-	return server.tokenize(req, false)
-}
-
-func (server NLPeweeServer) TokenizeClean(ctx context.Context, req *pb.TokenizeRequest) (*pb.TokenizeResponse, error) {
-	return server.tokenize(req, true)
-}
-
-func (server NLPeweeServer) tokenize(req *pb.TokenizeRequest, clean bool) (*pb.TokenizeResponse, error) {
 	text, lang, err := desTokenizeRequest(req)
 	if err != nil {
 		return nil, err
 	}
-	sentences, err := core.Tokenize(text, lang, clean)
+	sentences, err := core.Tokenize(text, lang)
 	if err != nil {
 		return nil, err
 	}

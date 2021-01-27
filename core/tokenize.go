@@ -7,7 +7,7 @@ import (
 	"strings"
 )
 
-func Tokenize(text string, lang Language, clean bool) ([]Sentence, error) {
+func Tokenize(text string, lang Language) ([]Sentence, error) {
 	doc, err := prose.NewDocument(text)
 	if err != nil {
 		return nil, err
@@ -16,7 +16,7 @@ func Tokenize(text string, lang Language, clean bool) ([]Sentence, error) {
 	if docSentences := doc.Sentences(); len(docSentences) > 1 {
 		var sentences []Sentence
 		for _, docSentence := range docSentences {
-			recursiveResult, err := Tokenize(docSentence.Text, lang, clean)
+			recursiveResult, err := Tokenize(docSentence.Text, lang)
 			if err != nil {
 				return nil, err
 			}
@@ -31,32 +31,27 @@ func Tokenize(text string, lang Language, clean bool) ([]Sentence, error) {
 	var sentence Sentence
 
 	for _, docToken := range doc.Tokens() {
-		var cleaned string
-
-		if clean && stopwordsLangCode != nil {
-			cleaned = cleanToken(docToken.Text, *stopwordsLangCode)
-			if len(cleaned) == 0 {
-				continue
-			}
-		}
-
 		token := Token{
+			full:  Text{raw: docToken.Text},
+			stem:  Text{},
 			tag:   docToken.Tag,
 			label: docToken.Label,
 		}
 
-		if len(cleaned) > 0 {
-			token.text = cleaned
-		} else {
-			token.text = docToken.Text
-		}
-
 		if snowballLangCode != nil {
-			stem, err := stemToken(token.text, *snowballLangCode)
+			var err error
+			token.stem.raw, err = stemToken(token.full.raw, *snowballLangCode)
 			if err != nil {
 				return nil, err
 			}
-			token.stem = stem
+		}
+
+		if stopwordsLangCode != nil {
+			token.full.cleaned = cleanToken(token.full.raw, *stopwordsLangCode)
+
+			if len(token.stem.raw) > 0 {
+				token.stem.cleaned = cleanToken(token.stem.raw, *stopwordsLangCode)
+			}
 		}
 
 		sentence.tokens = append(sentence.tokens, token)

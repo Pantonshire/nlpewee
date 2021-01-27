@@ -20,19 +20,20 @@ func (sentence *Sentence) Entities() []Entity {
 }
 
 type Token struct {
-	text, stem, tag, label string
+	full, stem Text
+	tag, label string
 }
 
-func (token *Token) Text() string {
+func (token *Token) Full() Text {
 	if token == nil {
-		return ""
+		return Text{}
 	}
-	return token.text
+	return token.full
 }
 
-func (token *Token) Stem() string {
+func (token *Token) Stem() Text {
 	if token == nil {
-		return ""
+		return Text{}
 	}
 	return token.stem
 }
@@ -49,6 +50,24 @@ func (token *Token) Label() string {
 		return ""
 	}
 	return token.label
+}
+
+type Text struct {
+	raw, cleaned string
+}
+
+func (text *Text) Raw() string {
+	if text == nil {
+		return ""
+	}
+	return text.raw
+}
+
+func (text *Text) Cleaned() string {
+	if text == nil {
+		return ""
+	}
+	return text.cleaned
 }
 
 type Entity struct {
