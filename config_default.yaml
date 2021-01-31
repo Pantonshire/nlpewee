@@ -4,3 +4,4 @@ tls:
   enabled: false
   key: path/to/key
   crt: path/to/crt
+concurrency_limit: 5

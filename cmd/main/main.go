@@ -18,9 +18,10 @@ import (
 )
 
 type config struct {
-	Port           uint          `yaml:"port"`
-	ConnectTimeout time.Duration `yaml:"connect_timeout"`
-	TLS            tlsConfig     `yaml:"tls"`
+	Port             uint          `yaml:"port"`
+	ConnectTimeout   time.Duration `yaml:"connect_timeout"`
+	TLS              tlsConfig     `yaml:"tls"`
+	ConcurrencyLimit uint          `yaml:"concurrency_limit"`
 }
 
 type tlsConfig struct {
@@ -57,6 +58,10 @@ func main() {
 		panic(err)
 	}
 
+	if conf.ConcurrencyLimit <= 0 {
+		panic("concurrency limit must be greater than zero")
+	}
+
 	core.Init()
 
 	address := fmt.Sprintf(":%d", conf.Port)
@@ -82,7 +87,7 @@ func main() {
 	}
 
 	grpcServer := grpc.NewServer(serverOptions...)
-	nlpeweeServer := server.NLPeweeServer{}
+	nlpeweeServer := server.NewServer(conf.ConcurrencyLimit)
 	pb.RegisterNLPeweeServer(grpcServer, nlpeweeServer)
 
 	fatal := make(chan error)
@@ -101,6 +106,7 @@ func main() {
 	select {
 	case <-interrupt:
 		fmt.Println("Interrupted, stopping server")
+		nlpeweeServer.Kill()
 		grpcServer.GracefulStop()
 		fmt.Println("Stopped server")
 	case err := <-fatal:

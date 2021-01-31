@@ -2,7 +2,8 @@ GO := go
 GO_BUILD := $(GO) build
 PROTOC := protoc
 
-MAIN := cmd/main/main.go
+MAIN_DIR := cmd/main
+MAIN := $(MAIN_DIR)/main.go
 BUILD := build
 DIST := $(BUILD)/dist
 EXEC := nlpewee
@@ -12,11 +13,14 @@ DEFAULT_CONF := config_default.yaml
 DIST_TARGETS := linux-amd64 linux-arm linux-arm64 darwin-amd64 windows-amd64 windows-arm
 FULL_DIST_TARGETS := $(addprefix dist-,$(DIST_TARGETS))
 
-PROTO_PATH := proto
-PROTO_SOURCE := $(wildcard $(PROTO_PATH)/*.proto)
+PROTO_DIR := proto
+PROTO_SOURCE := $(wildcard $(PROTO_DIR)/*.proto)
 PROTO_BUILD := $(PROTO_SOURCE:.proto=.pb.go)
 
 build: $(BUILD)/$(EXEC) $(EXEC)
+
+debug: buildpath
+	$(GO_BUILD) -tags debug -race -o $(BUILD)/$(EXEC)-debug $(wildcard $(MAIN_DIR)/*.go)
 
 $(BUILD)/$(EXEC): buildpath
 	$(GO_BUILD) -o $(BUILD)/$(EXEC) $(MAIN)
@@ -44,10 +48,10 @@ clean:
 
 proto: $(PROTO_BUILD)
 
-$(PROTO_PATH)/%.pb.go: $(PROTO_PATH)/%.proto
-	$(PROTOC) -I $(PROTO_PATH) --go_out=plugins=grpc,paths=source_relative:$(PROTO_PATH) $<
+$(PROTO_DIR)/%.pb.go: $(PROTO_DIR)/%.proto
+	$(PROTOC) -I $(PROTO_DIR) --go_out=plugins=grpc,paths=source_relative:$(PROTO_DIR) $<
 
 clean-proto:
-	rm $(wildcard $(PROTO_PATH)/*.pb.go)
+	rm $(wildcard $(PROTO_DIR)/*.pb.go)
 
-.PHONY: buildpath distpath build dist dist-% clean proto clean-proto
+.PHONY: buildpath distpath build debug dist dist-% clean proto clean-proto

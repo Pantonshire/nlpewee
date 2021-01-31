@@ -4,6 +4,7 @@ go 1.15
 
 require (
 	github.com/bbalet/stopwords v1.0.0
+	github.com/davecgh/go-spew v1.1.1
 	github.com/golang/protobuf v1.4.3
 	github.com/jdkato/prose/v2 v2.0.0
 	github.com/jessevdk/go-flags v1.4.0
